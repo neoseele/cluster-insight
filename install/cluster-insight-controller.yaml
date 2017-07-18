@@ -2,7 +2,7 @@ kind: ReplicationController
 apiVersion: v1
 metadata:
   name: cluster-insight-controller
-  namespace: default
+  # namespace: default
 spec:
   replicas: 1
   template:
