@@ -33,6 +33,6 @@ node {
         sh("kubectl --namespace=${env.BRANCH_NAME} apply -f install/cluster-insight-service.yaml")
         sh("echo http://`kubectl --namespace=${env.BRANCH_NAME} get service/${feSvcName} --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > ${feSvcName}")
         echo 'To access your environment run `kubectl proxy`'
-        echo "Then access your service via http://localhost:8001/api/v1/proxy/namespaces/${env.BRANCH_NAME}/services/${feSvcName}:80/"
+        echo "Then access your service via http://localhost:8001/api/v1/proxy/namespaces/${env.BRANCH_NAME}/services/${feSvcName}:5555/"
   }
 }

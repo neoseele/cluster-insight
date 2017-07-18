@@ -76,6 +76,9 @@ class GlobalState(object):
     self._rcontrollers_cache = simple_cache.SimpleCache(
         constants.MAX_CACHED_DATA_AGE_SECONDS,
         constants.CACHE_DATA_CLEANUP_AGE_SECONDS)
+    self._deployments_cache = simple_cache.SimpleCache(
+        constants.MAX_CACHED_DATA_AGE_SECONDS,
+        constants.CACHE_DATA_CLEANUP_AGE_SECONDS)
 
     self._bounded_semaphore = threading.BoundedSemaphore(
         constants.MAX_CONCURRENT_COMPUTE_GRAPH)
@@ -91,6 +94,9 @@ class GlobalState(object):
 
   def get_rcontrollers_cache(self):
     return self._rcontrollers_cache
+
+  def get_deployments_cache(self):
+    return self._deployments_cache
 
   def get_bounded_semaphore(self):
     return self._bounded_semaphore

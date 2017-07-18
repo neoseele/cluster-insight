@@ -39,7 +39,7 @@ import utilities
 KUBERNETES_API = 'https://%s:%s/api/v1'
 
 
-def get_kubernetes_base_url():
+def get_kubernetes_base_url(kube_api=KUBERNETES_API):
   """Returns the base URL for the Kubernetes master.
 
   Uses the environment variables for the kubernetes service.
@@ -490,3 +490,57 @@ def get_rcontrollers(gs):
   app.logger.info(
       'get_rcontrollers() returns %d rcontrollers', len(rcontrollers))
   return ret_value
+
+  @utilities.global_state_arg
+  def get_deployments(gs):
+    """Gets the list of deployments in the current cluster.
+
+    Args:
+      gs: global state.
+
+    Returns:
+      list of wrapped deployment objects.
+      Each element in the list is the result of
+      utilities.wrap_object(deployments, 'Deployments', ...)
+
+    Raises:
+      CollectorError: in case of failure to fetch data from Kubernetes.
+      Other exceptions may be raised due to exectution errors.
+    """
+    deployments, ts = gs.get_deployments_cache().lookup('')
+    if ts is not None:
+      app.logger.debug(
+          'get_deployments() cache hit returns %d rcontrollers',
+          len(deployments))
+      return deployments
+
+    deployments = []
+    url = get_kubernetes_base_url('https://%s:%s/apis/extensions/v1beta1') + \
+        '/deployments'
+
+    try:
+      result = fetch_data(gs, url)
+    except Exception:
+      msg = 'fetching %s failed with exception %s' % (url, sys.exc_info()[0])
+      app.logger.exception(msg)
+      raise collector_error.CollectorError(msg)
+
+    now = time.time()
+    if not (isinstance(result, dict) and 'items' in result):
+      msg = 'invalid result when fetching %s' % url
+      app.logger.exception(msg)
+      raise collector_error.CollectorError(msg)
+
+    for deployment in result['items']:
+      name = utilities.get_attribute(deployment, ['metadata', 'name'])
+      if not utilities.valid_string(name):
+        # an invalid replication controller without a valid rcontroller ID.
+        continue
+
+      deployments.append(utilities.wrap_object(
+          deployment, 'Deployment', name, now))
+
+    ret_value = gs.get_deployments_cache().update('', deployments, now)
+    app.logger.info(
+        'get_deployments() returns %d deployments', len(deployments))
+    return ret_value
