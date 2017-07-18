@@ -7,7 +7,7 @@ node {
   checkout scm
 
   stage 'Build image'
-  sh("docker build -t ${imageTag} server")
+  sh("docker build -t ${imageTag} collector")
 
   stage 'Push image to registry'
   sh("gcloud docker -- push ${imageTag}")
