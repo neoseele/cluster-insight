@@ -136,6 +136,20 @@ def get_rcontrollers():
 
   return flask.jsonify(utilities.make_response(rcontrollers_list, 'resources'))
 
+ @app.route('/cluster/resources/deployments', methods=['GET'])
+ def get_deployments():
+   """Computes the response of accessing the '/cluster/resources/deployments'.
+
+   Returns:
+     The deployments of the context graph.
+   """
+   gs = app.context_graph_global_state
+   try:
+     deployments_list = kubernetes.get_deployments(gs)
+   except collector_error.CollectorError as e:
+     return flask.jsonify(utilities.make_error(str(e)))
+
+   return flask.jsonify(utilities.make_response(deployments_list, 'resources'))
 
 @app.route('/cluster/resources/pods', methods=['GET'])
 def get_pods():
