@@ -69,7 +69,7 @@ def get_kubernetes_base_url(kube_api=KUBERNETES_API):
     raise collector_error.CollectorError(
         'KUBERNETES_SERVICE_PORT environment variable is not set')
 
-  return KUBERNETES_API % (service_host, service_port)
+  return kube_api % (service_host, service_port)
 
 
 KUBERNETES_BEARER_TOKEN = ''
