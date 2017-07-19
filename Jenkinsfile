@@ -17,8 +17,8 @@ node {
     // Roll out to canary or production environment
     case ["master"]:
         // Change deployed image in canary to the one we just built
-        sh("sed -i.bak 's#kubernetes/cluster-insight:v2.0-alpha#${imageTag}#' ./install/cluster-insight-controller.yaml")
-        sh("kubectl --namespace=prod apply -f install/cluster-insight-controller.yaml")
+        sh("sed -i.bak 's#kubernetes/cluster-insight:v2.0-alpha#${imageTag}#' ./install/cluster-insight-deployment.yaml")
+        sh("kubectl --namespace=prod apply -f install/cluster-insight-deployment.yaml")
         sh("kubectl --namespace=prod apply -f install/cluster-insight-service.yaml")
         sh("echo http://`kubectl --namespace=prod get service/${feSvcName} --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > ${feSvcName}")
         break
@@ -28,8 +28,8 @@ node {
         // Create namespace if it doesn't exist
         sh("kubectl get ns ${env.BRANCH_NAME} || kubectl create ns ${env.BRANCH_NAME}")
         // Don't use public load balancing for development branches
-        sh("sed -i.bak 's#kubernetes/cluster-insight:v2.0-alpha#${imageTag}#' ./install/cluster-insight-controller.yaml")
-        sh("kubectl --namespace=${env.BRANCH_NAME} apply -f install/cluster-insight-controller.yaml")
+        sh("sed -i.bak 's#kubernetes/cluster-insight:v2.0-alpha#${imageTag}#' ./install/cluster-insight-deployment.yaml")
+        sh("kubectl --namespace=${env.BRANCH_NAME} apply -f install/cluster-insight-deployment.yaml")
         sh("kubectl --namespace=${env.BRANCH_NAME} apply -f install/cluster-insight-service.yaml")
         sh("echo http://`kubectl --namespace=${env.BRANCH_NAME} get service/${feSvcName} --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > ${feSvcName}")
         echo 'To access your environment run `kubectl proxy`'
