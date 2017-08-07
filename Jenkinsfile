@@ -22,7 +22,6 @@ node {
         sh("kubectl --namespace=prod apply -f install/cluster-insight-service.yaml")
         sh("echo http://`kubectl --namespace=prod get service/${feSvcName} --output=json | jq -r '.status.loadBalancer.ingress[0].ip'` > ${feSvcName}")
         break
-
     // Roll out a dev environment
     default:
         // Create namespace if it doesn't exist
